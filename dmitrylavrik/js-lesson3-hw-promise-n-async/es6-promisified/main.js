@@ -17,4 +17,4 @@ ArticlesModel.all()
         return ArticlesModel.all()
     })
     .then((articles) => console.log('Articles count = ' + articles.length))
-    .catch((e) => console.log('Ошибка!' + e.msg));
+    .catch((e) => console.log('Ошибка! /main.js ' + e.msg));

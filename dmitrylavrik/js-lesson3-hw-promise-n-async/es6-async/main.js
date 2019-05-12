@@ -18,4 +18,3 @@ import * as ArticlesModel from './articles';
 
     return articlesAgain;
 })().then(() => {}).catch((e) => console.log('Ошибка! / main.js' + e.msg));
-

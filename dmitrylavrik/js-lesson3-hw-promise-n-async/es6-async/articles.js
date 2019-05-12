@@ -1,43 +1,18 @@
 import * as serverApi from './db';
 
-function all() {
-    return new Promise(function (res, rej) {
-        serverApi.all().then((response) => {
-            let info = JSON.parse(response);
-            if (info.code === 200) {
-                res(info.data);
-            } else {
-                rej(info.status);
-            }
-        });
-    });
-}
+const parseRes = (rs) => {
+    let info = JSON.parse(rs);
+    if (info.code === 200) {
+        return info.data;
+    } else {
+        throw new Error('info.code !== 200');
+    }
+};
+const all = async () => parseRes(await serverApi.all());
 
-function one(id) {
-    return new Promise(function (res, rej) {
-        serverApi.get(id).then((response) => {
-            let info = JSON.parse(response);
-            if (info.code === 200) {
-                res(info.data);
-            } else {
-                rej(info.status);
-            }
-        });
-    });
-}
+const one = async (id) => parseRes(await serverApi.get(id));
 
-function remove(id) {
-    return new Promise(function (res, rej) {
-        serverApi.remove(id).then((response) => {
-            let info = JSON.parse(response);
-            if (info.code === 200) {
-                res(info.data);
-            } else {
-                rej(info.status);
-            }
-        });
-    });
-}
+const remove = async (id) => parseRes(await serverApi.remove(id));
 
 export {
     all,

@@ -8,62 +8,61 @@ const BAD_JSON_PROPABILITY = 0;
  * Получить все записи из хранилища
  * @param {callable} onAnswer Функция, обрабатывающая ответ от сервера в формате JSON 
  */
-export const all = () => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY, () => {
-    res(serverAnswer(articlesStorage));
-}, () => {
-    res(serverAnswer('', 100500, "Propability Error"));
-}))
+export const all = () => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY)
+    .then(() => {
+        res(serverAnswer(articlesStorage));
+    })
+    .catch(() => {
+        res(serverAnswer('', 100500, "Propability Error"));
+    }))
 
 /**
  * Получить статью по id
  * @param {int} id Id статьи
  * @param {callable} onAnswer Функция, обрабатывающая ответ от сервера в формате JSON 
  */
-export const get = (id) => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY, () => {
-    res(serverAnswer(articlesStorage[mapArticles[id]]));
-}, () => {
-    res(serverAnswer('', 100500, "Propability Error"));
-}))
+export const get = (id) => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY)
+    .then(() => {
+        res(serverAnswer(articlesStorage[mapArticles[id]]));
+    })
+    .catch(() => {
+        res(serverAnswer('', 100500, "Propability Error"));
+    }))
 
 /**
  * Удалить статью из базы
  * @param {int} id Id статьи
  * @param {callable} onAnswer Функция, обрабатывающая ответ от сервера в формате JSON  
  */
-export const remove = (id) => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY, () => {
-    if (id in mapArticles) {
-        let num = mapArticles[id];
-        delete mapArticles[id];
-        articlesStorage.splice(num, 1);
-        res(serverAnswer(true));
-    } else {
-        res(false);
-    }
-}, () => {
-    res(serverAnswer('', 100500, "Propability Error"));
-}))
+export const remove = (id, onAnswer) => new Promise((res, rej) => TimeoutPropabiliry(300, GLOBAL_PROPABILITY)
+    .then(() => {
+        if (id in mapArticles) {
+            let num = mapArticles[id];
+            delete mapArticles[id];
+            articlesStorage.splice(num, 1);
+            res(serverAnswer(true));
+        } else {
+            res(false);
+        }
+    })
+    .catch(() => {
+        res(serverAnswer('', 100500, "Propability Error"));
+    }))
 
 /* полуприватная часть, вдруг захотите сделать промис :) */
-const TimeoutPropabiliry = (time, probability, onSuccess, onError) => window.setTimeout(() => {
-    Math.random() < probability ? onSuccess() : onError();
-}, time)
-
-const serverAnswer = (data, code = 200, status = "OK") => {
-    // if (Math.random() < BAD_JSON_PROPABILITY) {
-    //     return 'incorrect json';
-    // }
-
-    // return JSON.stringify({
-    //     code,
-    //     status,
-    //     data
-    // });
-    return (Math.random() < BAD_JSON_PROPABILITY) ? 'incorrect json' : JSON.stringify({
-        code,
-        status,
-        data
+function TimeoutPropabiliry(time, probability) {
+    return new Promise(function (res, rej) {
+        window.setTimeout(() => {
+            Math.random() < probability ? res() : rej();
+        }, time);
     });
 }
+
+const serverAnswer = (data, code = 200, status = "OK") => (Math.random() < BAD_JSON_PROPABILITY) ? 'incorrect json' : JSON.stringify({
+    code,
+    status,
+    data
+});
 
 /*  приватная часть */
 let articlesStorage = [{
